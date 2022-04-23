@@ -1,0 +1,37 @@
+version: '2.1'
+networks: {}
+volumes:
+  resin-data: {}
+  can-logs: {}
+services:
+  caninterfacestarter:
+    #image: "balenalib/%%BALENA_MACHINE_NAME%%-ubuntu"
+    image: "balenalib/fincm3-ubuntu"
+    privileged: true
+    command: "ip link set can0 up type can bitrate 1000000"
+    network_mode: host
+    labels:
+      io.resin.features.kernel-modules: '1'
+      io.resin.features.firmware: '1'
+      io.resin.features.dbus: '1'
+      io.resin.features.supervisor-api: '1'
+      io.resin.features.resin-api: '1'
+    restart: no
+  busconnector:
+    build:
+      context: busconnector/
+    depends_on:
+      - caninterfacestarter
+    privileged: true
+    restart: always
+    network_mode: host
+    volumes:
+      - 'resin-data:/data'
+      - 'can-logs:/var/log/can'
+    labels:
+      io.resin.features.kernel-modules: '1'
+      io.resin.features.firmware: '1'
+      io.resin.features.dbus: '1'
+      io.resin.features.supervisor-api: '1'
+      io.resin.features.resin-api: '1'
+

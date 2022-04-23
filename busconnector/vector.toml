@@ -1,0 +1,23 @@
+[sources.candump]
+type = "exec"
+mode = "streaming"
+command = ["candump", "-L", "any"]
+
+[sinks.humio]
+type = "humio_logs"
+inputs = ["candump"]
+host_key = "${HUMIO_HOST:-cloud.humio.com}"
+compression = "gzip"
+token = "${HUMIO_TOKEN}"
+
+  [sinks.humio.encoding]
+  codec = "text"
+
+[sinks.file]
+type = "file"
+inputs = ["candump"]
+compression = "none"
+path = "/var/log/can/%Y-%m-%d.log"
+
+  [sinks.file.encoding]
+  codec = "ndjson"
