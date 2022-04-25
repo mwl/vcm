@@ -1,0 +1,35 @@
+dataDirectory: data
+sources:
+  candump:
+    type: "cmd"
+    cmd: "/usr/bin/candump"
+    args:
+      - "-L"
+      - "any"
+    frequency: 21600 #6 hours
+    sink: humio_cloud
+sinks:
+  humio_cloud:
+    type: humio
+    token: "${HUMIO_TOKEN}"
+    url: "https://cloud.humio.com" # Change to https://${HUMIO_HOST:cloud.humio.com}
+    compression: "gzip"
+    compressionLevel: 9
+    queue:
+      # Default: 1024
+      maxEventsPerRequest: 1024
+
+      # fullAction determines queue behaviour when it is full.
+      #   pause = queue pauses ingesting new batches if it is full (Default if not mentioned)
+      #   deleteLatest = queue continues to accept new batches but deletes the latest batch if it is full
+      #   deleteOldest = queue deletes the oldest batch to accept new batches if it is full
+      # Default: pause
+      fullAction: deleteOldest
+
+      memory:
+        # Default: 1000
+        flushTimeOutInMillisecond: 1000
+        # Default: 2048
+        maxLimitInMB: 256
+
+
